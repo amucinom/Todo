@@ -1,0 +1,142 @@
+<html>
+<head>
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+	<script>
+	/*
+	This method uses a couple different methods of instantiating the
+	XMLHttpRequest object. The reason we do this is so we can support
+	multiple browser (I've only tested in IE and Firefox).
+	*/
+	function getXMLHTTPRequest()
+	{
+	    var request;
+
+	    // Lets try using ActiveX to instantiate the XMLHttpRequest object
+	    try{
+	        request = new ActiveXObject("Microsoft.XMLHTTP");
+	    }catch(ex1){
+	        try{
+	            request = new ActiveXObject("Msxml2.XMLHTTP");
+	        }catch(ex2){
+	            request = null;
+	        }
+	    }
+
+	    // If the previous didn't work, lets check if the browser natively support XMLHttpRequest
+	    if(!request && typeof XMLHttpRequest != "undefined"){
+	        //The browser does, so lets instantiate the object
+	        request = new XMLHttpRequest();
+	    }
+
+	    return request;
+	}
+
+
+   function loadURL(url, callback)
+   {
+       var aXMLHttpRequest = getXMLHTTPRequest();
+       var allData;
+
+       if (aXMLHttpRequest){
+           aXMLHttpRequest.open("GET", url, true);
+           aXMLHttpRequest.onreadystatechange = function (aEvt) {
+   				if(aXMLHttpRequest.readyState == 4){
+ 				   allData = aXMLHttpRequest.responseText;
+				   callback(allData);
+			   }
+
+        };
+
+        //Lets fire off the request
+           aXMLHttpRequest.send(null);
+       }
+
+       else
+       {
+           //Oh no, the XMLHttpRequest object couldn't be instantiated.
+           alert("A problem occurred instantiating the XMLHttpRequest object.");
+       }
+   }
+
+
+   function addNew()
+   {
+	   var newtodo = prompt("Enter new todo", "");
+	   var url = "./addtodo?newtodo=" + encodeURIComponent(newtodo);
+	   var callback = function(data){
+		   if(data === "added"){
+			   updateList();
+		   }
+	   };
+	   loadURL(url, callback);
+   }
+
+   function updateList()
+   {
+	   var url = "./listtodos";
+	   var callback = function(data){
+		   var list = JSON.parse(data);
+		   var output = "";
+		   for(var i=0; i < list.length; i++){
+		   	   output = output + "<div id='todoNode" + i +  "'>";
+			   output = output + "<p>" + list[i] + "</p>";
+			   output = output + "<a class='btn btn-danger btn-xs' href='javascript:deleteTodo(" + i.toString() + ")'>" + "Delete</a>";
+			   output = output + "<hr>";
+			   output = output + "</div>";
+		   }
+		   document.getElementById("list").innerHTML = output;
+	   };
+	   loadURL(url, callback);
+
+   }
+
+   // function deleteTodo(index){
+	  //  var url = "./deletetodo?index=" + encodeURIComponent(index);
+	  //  var callback = function(data){
+	  //  var list = JSON.parse(data);
+	  //  console.log(list);
+	  //   // list.splice(index,1);
+		 //   // if(data === "deleted"){
+			//   //  updateList();
+		 //   // }
+	  //  };
+	  //  loadURL(url, callback);
+   // }
+
+
+   function deleteTodo(index) {
+
+   	// var callback = function (data) {
+   	// 			var list = JSON.parse(data);
+   	// 			list.splice(index,1);
+   	// 		};
+   		console.log(index);
+
+		var result = confirm("Are you sure you want to delete?");
+		if (result === true) {
+		    // index = obj.parentNode.parentNode.rowIndex;
+
+		    var list = document.getElementById("list");
+		    var child = document.getElementById("todoNode" + index );
+
+		    list.removeChild(child);
+
+		    var url = "./deletetodo?index=" + encodeURIComponent(index);
+		}
+    }
+	</script>
+
+</head>
+<body><div class="container">
+	<h1> Todos </h1>
+	<a class="btn btn-primary" href='javascript:addNew()'>Add new</a>
+	<hr>
+	<div id="list">
+		Add new To-do's!!
+	</div></div>
+</body>
+
+</html>
