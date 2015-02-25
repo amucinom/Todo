@@ -17,7 +17,13 @@ var todos = [];
 
 app.get("/addtodo", function (req, res) {
 	var x = req.query.newtodo;
-	todos[todos.length] = x;
+  var callback = function (error, result) {
+    if (!error) {
+      res.end("added");
+    }
+  };
+  db.collection("todo").insert(x, callback);
+	// todos[todos.length] = x;
 	res.end("added");
  });
 
