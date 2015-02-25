@@ -34,7 +34,12 @@ app.get("/deletetodo", function (req, res) {
 
 
 app.get("/listtodos", function (req, res) {
-	res.end(JSON.stringify(todos));
+  db.collection('todo').find().toArray(function (err, result) {
+    if (!err) {
+      res.end(JSON.stringify(result));
+    }
+  });
+	// res.end(JSON.stringify(todos));
 });
 
 
