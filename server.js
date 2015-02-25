@@ -10,6 +10,9 @@ app.get("/", function (req, res) {
   res.redirect("/index.html");
 });
 
+var db = require('mongoskin').db('user:password@localhost:27017/todo');
+console.log(db);
+
 var todos = [];
 
 app.get("/addtodo", function (req, res) {
